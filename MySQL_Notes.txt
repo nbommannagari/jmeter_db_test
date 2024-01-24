@@ -1,0 +1,187 @@
+
+
+load data INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/books.csv" INTO TABLE books fields TERMINATED BY "," LINES TERMINATED BY "\r\n" IGNORE 1 rows (bk_title, bk_author);
+
+
+
+
+
+load data INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/books.csv" INTO TABLE books fields TERMINATED BY "," LINES TERMINATED BY "\r\n" IGNORE 1 rows (bk_title, bk_author);
+
+
+load data INFILE "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\books.csv"
+INTO TABLE books
+fields TERMINATED BY ","
+LINES TERMINATED BY "\r\n"
+IGNORE 1 rows
+(bk_title, bk_author);
+
+
+create table books(
+book_id serial,
+book_name varchar(100),
+book_publication_year integer,
+author_id integer,
+constraint fk_authors foreign key (author_id) references authors(author_id));
+
+
+insert into authors(author_id, author_name, author_year_of_birth, author_country) values (1,'J K Rowling','1970','UK');
+insert into authors(author_id, author_name, author_year_of_birth, author_country) values (2,'John Bunyan','1600','England');
+insert into authors(author_id, author_name, author_year_of_birth, author_country) values (3,'Daniel Defoe','1719','Ireland');
+
+
+insert into books(book_id, book_name, book_publication_year, author_id) values (1,'Harry Potter', 2000, 1);
+insert into books(book_id, book_name, book_publication_year, author_id) values (2,'The Piligrims Progress', 1678, 2);
+insert into books(book_id, book_name, book_publication_year, author_id) values (3,'Robinson Crusoe', 1730, 3);
+
+select l.author_name,l.author_country, r.book_name, r.book_publication_year
+from authors as l join books as r
+on l.author_id = r.author_id;
+
+select bird_picture into dumpfile "c:\\programdata\\mysql\\mysql server 8.0\\uploads\\out.jpg" from birds where bird_id=1;
+
+update birds set bird_picture = load_file("c:\\programdata\\mysql\\mysql server 8.0\\uploads\\bird.jpg") where bird_id=1;
+
+update authors set author_picture = load_file("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\1JKRowling.jpg") where author_id = 1;
+
+update authors set author_picture = load_file("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\JKRowling.jpg") where author_id = 2;
+update authors set author_picture = load_file("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\3JKRowling.jpg") where author_id = 3;
+
+select author_picture into dumpfile "c:\\programdata\\mysql\\mysql server 8.0\\uploads\\out.jpg" from authors where author_id = 1;
+
+create database requests;
+create table psots(
+post_id int,
+post_user_id int,,
+post_title varchar(100),
+post_body varchar(100));
+
+
+
+create table bitcoin_prices(
+month varchar(30),
+high decimal(8,2),
+low decimal(8,2));
+
+
+
+select X.month as max_value_date, high_value, Y.month as Min_val_date, low_value
+from
+(
+select month,high as high_value from bitcoin_prices
+where high=(select max(high) from bitcoin_prices b)
+)X cross join
+(
+select month,low as low_value from bitcoin_prices
+where low=(select min(low) from bitcoin_prices c)
+)Y;
+
+http://127.0.0.1:8000/getfruit?name=George%20Orwell
+
+
+
+select l.author_name, r.book_name from authors as l join books as r on l.author_id = r.author_id and l.author_name like '%J K%';
+
+--------------
+add a new api to add a new author
+author name, country, year of birth
+deploy the new api
+
+test the api using postman
+make sure it is a POST request
+put the data into the body of the request
+
+check that the data has been inserted correctly
+class Fruit(BaseModel):
+    fruit_name : str
+    fruit_qty : int
+@app.post("/newfruit")
+def api_newfruit(fruit : Fruit):
+    con = pymysql.connect(host="localhost",
+                          user="root",
+                          password="root123",
+                          database="fruit_db")
+    cur = con.cursor()
+
+    sql = f"insert into fruit(fruit_name, fruit_qty) values('{fruit.fruit_name}', {fruit.fruit_qty})"
+    cur.execute(sql)
+
+    sql = "select last_insert_id()"
+    cur.execute(sql)
+    newid = cur.fetchone()
+con.commit()
+    cur.close()
+    con.close()
+    return {"message": "inserted",
+            "new id": newid}
+
+
+
+------SQL injection issues
+find the open port
+make sure you have telnet on your machine
+.. open a command prompt
+.. type : telnet
+.. if nothing appears -   pkgmgr /iu:"TelnetClient"
+.. my ip address is 35.178.198.206
+.. the mysql port number is 3306
+.. remoteroot
+.. root123
+try telnet - see what response you get    telnet <ipaddress> <port number>
+use mysql workbench - try making a connection
+what's the magic word?
+inject yourself into my application
+in a browser go to 35.178.198.206
+go to get credit card details page
+try some sql injection queries
+example :    ' or '1'='1
+-----
+create two new roles
+1  allows inserting into authors database
+2  allows selecting from authors database
+create a user for each role. give each user a password
+
+try the users in mysql workbench or on the command line
+make sure they are permitted to do only the things they should
+be able to do
+
+change the script from yesterday
+new author - use the user that can insert data
+get author - use the user that can select data
+
+deploy the api and make sure it still works with the new users
+----------
+create an exported file:
+select * into outfile "c:\\....\\mydata.csv" from authors
+check the file contains the expected data
+
+use mysqldump...
+open a command prompt
+change to c:\program files\mysql\mysql server 8.0\bin
+mysqldump -u username -p databasename > path\backup.sql
+
+in mysql...
+create a new empty database
+on the command line...
+mysql -u username -p newdatabasename < path\backup.sql
+open mysql again
+use the new database
+verify that the data has been reimported
+
+----------
+
+If cardinality value (Number of unique values) is less then creating index will slowdown the performance
+
+
+explain select * from people where  ppl_first_name = 'Deane' and ppl_last_name='Akehurst';
+
+create index ppl_first_name_i1 on people(ppl_first_name);
+
+create index ppl_last_name_i1 on people(ppl_last_name);
+
+create index ppl_first_last_name_i1 on people(ppl_first_name,ppl_last_name);
+
+explain analyze select * from people where  ppl_first_name = 'Deane' and ppl_last_name='Akehurst';
+
+
+
